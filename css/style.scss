@@ -8,9 +8,13 @@ $bColor : rgb(250, 250, 250);
   -webkit-transform: $pro;
   -o-transform: $pro;
 }
+body{
+  overflow: hidden;
+}
 .hidden{
   visibility: hidden;
 }
+
 #gameCanvas{
   position: absolute;
   top: 50%;
