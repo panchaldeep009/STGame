@@ -16,5 +16,6 @@ body {
   -webkit-transform: translate(-50%, -50%);
   -o-transform: translate(-50%, -50%);
   border: 1px solid #969696;
+  cursor: none;
 }
 /*# sourceMappingURL=style.css.map */
