@@ -198,7 +198,6 @@ var gamePlay = setInterval(function(){
             bullet.splice(i,1);
         }
     }
-    
     // print traget Circle
     tSize = 50;
     ctx.beginPath();
