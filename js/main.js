@@ -29,6 +29,10 @@ function minWinSize() {
         return winH();
     }
 }
+// To generate Random Number 
+function getRNum(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 // Set Globle Game Canvas veriable
 var gameCanvas = el("#gameCanvas");
 // Set Canvas to 2 Dimentional
@@ -55,8 +59,10 @@ player[1][6] = -(player[1][0]/2);
 player[1][3] = 0;
 // Set Player[N][4] = Rotation
 player[1][4] = 0;
-//Veriable to Bullets
+//Veriable for Bullets
 var bullet = [];
+//Veriable for Villen
+var villan = [];
 // Veriable to store Mouse movement to get difference of change
 var previousMouseX,previousMouseY = null;
 // Veriables to track mouse movement on canvas
@@ -65,8 +71,8 @@ var offset, mouseX = 0, mouseY = 0;
 document.onmousemove = function(e) {
     offset = gameCanvas.getBoundingClientRect(); 
     // Set mouse position on canavas
-    mouseX = e.pageX - offset.left;
-    mouseY = e.pageY - offset.top;
+        mouseX = e.pageX - offset.left;
+        mouseY = e.pageY - offset.top;
 }
 var movePlayer = true;
 // on keypress
@@ -147,7 +153,46 @@ document.onclick = function(e){
     //bullet[N][7] is Y postion of bullet inside of canvas
     bullet[i][7] = 20;
 }
-
+setInterval(function(){ 
+    if(villan.length < 50){
+        //New Bullet number
+        i = villan.length;
+        //set 2 dimation villen array 
+        villan[i] = [];
+        //villen[N][0] is Style                    
+        villan[i][0] = 0;
+        radomCase = getRNum(1,5);
+            if(radomCase==1){
+                //villen[N][1] is X position
+                villan[i][1] = canvasSize; 
+                //villen[N][2] is Y position
+                villan[i][2] = getRNum(0,canvasSize);
+            } else if(radomCase==2){
+                //villen[N][1] is X position
+                villan[i][1] = getRNum(0,canvasSize); 
+                //villen[N][2] is Y position
+                villan[i][2] = canvasSize;
+            } else if(radomCase==3){
+                //villen[N][1] is X position
+                villan[i][1] = 0; 
+                //villen[N][2] is Y position
+                villan[i][2] = getRNum(0,canvasSize);
+            } else {
+                //villen[N][1] is X position
+                villan[i][1] = getRNum(0,canvasSize); 
+                //villen[N][2] is Y position
+                villan[i][2] = 0;
+            }
+        //villen[N][3] is width
+        villan[i][3] = 150;
+        //villen[N][4] is height
+        villan[i][4] = 150;
+        //villen[N][5] is Rotattion
+        villan[i][5] = 0;  
+        //for villen Animation Frame change
+        villan[i][6] = 0; 
+    }
+ }, 2000);
 // Refresh Game canvas at 60 fps
 var gamePlay = setInterval(function(){ 
     // Clear Canvas
@@ -204,4 +249,26 @@ var gamePlay = setInterval(function(){
     ctx.arc(mouseX, mouseY, tSize/2, 0, 2 * Math.PI);
     ctx.stroke();
 
+    // Print all villen
+    for(i=0;i<villan.length;i++){
+        villan[i][6]++;
+        radians = Math.atan2(player[1][1]-villan[i][1], player[1][2]-villan[i][2]);
+        villan[i][5] = Math.round(radians * (180 / Math.PI) * -1); 
+        ctx.translate(villan[i][1],villan[i][2]);                        
+        ctx.rotate((villan[i][5] * Math.PI) / 180);
+        //ctx.fillStyle = "#333333";
+        //ctx.fillRect(0, 0, canvasSize, canvasSize);
+        villanImg = el("#villan");
+        ctx.drawImage(villanImg, villan[i][0], 0, 150, 150, -villan[i][3]/2, -villan[i][4]/2, villan[i][3], villan[i][4]);
+        ctx.rotate((-villan[i][5] * Math.PI) / 180);
+        ctx.translate(-villan[i][1],-villan[i][2]);   
+        villan[i][2] += (Math.cos(villan[i][5]))*0.5;
+        villan[i][1] -= (Math.sin(villan[i][5]))*0.5; 
+        
+        if(villan[i][6]%12==0){  
+            if(villan[i][0] == 150) { villan[i][0] = 0; }
+            else { villan[i][0] = 150; }
+        }
+    }                 
+    el("#status").innerHTML = villan.length;  
 }, 1000/60);
