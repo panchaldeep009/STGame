@@ -33,29 +33,29 @@ function minWinSize() {
 function getRNum(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
-// Set Globle Game Canvas veriable
+// Set Global Game Canvas variable
 var gameCanvas = el("#gameCanvas");
 //Set Game canvas Size
 canvasSize = minWinSize()-100;
 gameCanvas.setAttribute("width", canvasSize);
 gameCanvas.setAttribute("height", canvasSize);
-// Veriable to store Players
+// Variable to store Players
 var player = [];
-// Veriable for Bullets
+// Variable for Bullets
 var bullet = [];
-//Veriable for Villain
+//Variable for Villain
 var villain = [];
-// Veriable for how many players are playing
+// Variable for how many players are playing
 var players = 1; 
-// Veriable for which player has Controll
+// Variable for which player has Control
 var cplayer = 1;
 // control allowance Status for player
 var movePlayer = true;
-// Veriables to store player looking cordinates
+// Variables to store player looking coordinates
 var look = [];
-// initilize All Player
+// initialize All Player
 for(i=1;i<=players;i++){
-    // initilize Player i
+    // initialize Player i
     player[i] = [];
     // Set Player[i][0] = size
     player[i][0] = 120;
@@ -75,15 +75,15 @@ for(i=1;i<=players;i++){
     bullet[i] = [];
     //Set looking direction for player i
     look[i] = [];
-    //Set where player i looking on X axies 
+    //Set where player i looking on X axis 
     look[i][1] = canvasSize/2;
-    //Set where player i looking on Y axies 
+    //Set where player i looking on Y axis 
     look[i][2] = 0;
 }
 // Mouse move on game canvas
 document.onmousemove = function(e) {
     offset = gameCanvas.getBoundingClientRect(); 
-    // Set controlling player looking on mouse position on canavas
+    // Set controlling player looking on mouse position on canvas
     look[cplayer][1] = e.pageX - offset.left;
     look[cplayer][2] = e.pageY - offset.top;
 }
@@ -122,7 +122,7 @@ document.onkeydown = function(e) {
     }
     }
 }
-// on click add new bullet to arrary
+// on click add new bullet to array
 document.onclick = function(e){
     //bullet width
     bw = 16;
@@ -130,7 +130,7 @@ document.onclick = function(e){
     bh = 8;
     //New Bullet array number
     i = bullet[cplayer].length;
-    //set 2 dimation bullet array 
+    //set 2 dimensions bullet array 
     bullet[cplayer][i] = [];
     //bullet[N][0] is Rotation
     bullet[cplayer][i][0] = player[cplayer][4]; 
@@ -144,33 +144,33 @@ document.onclick = function(e){
     bullet[cplayer][i][4] = bh;
     //bullet[N][5] is Style
     bullet[cplayer][i][5] = "#FFFF00";
-    //bullet[N][6] is X postion of bullet inside of canvas
+    //bullet[N][6] is X position of bullet inside of canvas
     bullet[cplayer][i][6] = 50; 
-    //bullet[N][7] is Y postion of bullet inside of canvas
+    //bullet[N][7] is Y position of bullet inside of canvas
     bullet[cplayer][i][7] = 20;
 }
 
-// Put Villain after each 2 secound
+// Put Villain after each 2 second
 var villainComing = setInterval(function(){ 
     if(villain.length < 50){
         //New Bullet number
         i = villain.length;
-        //set 2 dimation villain array 
+        //set 2 dimensions villain array 
         villain[i] = [];
         //villain[N][0] is Style                    
         villain[i][0] = 0;
-        radomCase = getRNum(1,5);
-            if(radomCase==1){
+        randomCase = getRNum(1,5);
+            if(randomCase==1){
                 //villain[N][1] is X position
                 villain[i][1] = canvasSize; 
                 //villain[N][2] is Y position
                 villain[i][2] = getRNum(0,canvasSize);
-            } else if(radomCase==2){
+            } else if(randomCase==2){
                 //villain[N][1] is X position
                 villain[i][1] = getRNum(0,canvasSize); 
                 //villain[N][2] is Y position
                 villain[i][2] = canvasSize;
-            } else if(radomCase==3){
+            } else if(randomCase==3){
                 //villain[N][1] is X position
                 villain[i][1] = 0; 
                 //villain[N][2] is Y position
@@ -185,7 +185,7 @@ var villainComing = setInterval(function(){
         villain[i][3] = 150;
         //villain[N][4] is height
         villain[i][4] = 150;
-        //villain[N][5] is Rotattion
+        //villain[N][5] is Rotation
         villain[i][5] = 0;  
         //for villain Animation Frame change
         villain[i][6] = 0; 
@@ -199,19 +199,19 @@ var gamePlay = setInterval(function(){
 
     // Print all Players and his Bullets 
     for(y=1;y<player.length;y++){
-        // Print Player Y and reupdate changes
+        // Print Player Y and re-update changes
         player[y] = putPlayer(player[y],movePlayer,look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
-        // Print all bullets of Player[Y] thats stored in arrey 
+        // Print all bullets of Player[Y] thats stored in array 
         bullet[y] = putBullets(bullet[y],gameCanvas,canvasSize,canvasSize);
     }
     // Print all villain in Game Canvas
-    villain = putVillains(villain,player,gameCanvas);
+    villain = putVillains(villain,player,bullet,gameCanvas);
 
 }, 1000/60);
 
 // To clear game canvas : gc = Game Canvas, wC = width of Canvas, hC = Height of Canvas
 function clearGameCanvas(gC,wC,hC){
-    // Set Canvas to 2 Dimentional
+    // Set Canvas to 2 dimensional
     ctx = gC.getContext("2d");
     // Fill Background
     ctx.fillStyle = "#FFFFFF";
@@ -219,7 +219,7 @@ function clearGameCanvas(gC,wC,hC){
 }
 // To put player in game canvas : ply = Player, mA = Movement allowance, lX = looking X position on canvas, lY = looking Y position on canvas, gc = Game Canvas, wC = width of Canvas, hC = Height of Canvas
 function putPlayer(ply,mA,lX,lY,gC,wC,hC){
-    // Set Canvas to 2 Dimentional
+    // Set Canvas to 2 dimensional
     ctx = gC.getContext("2d");
 
     // Get radians by Anti Tan of X any Y side from player origin
@@ -228,7 +228,7 @@ function putPlayer(ply,mA,lX,lY,gC,wC,hC){
     if(mA){
         ply[4] = Math.round((radians * (180 / Math.PI) * -1)+90);
     }
-    // translate ctx to player's XY cordinates
+    // translate ctx to player's XY coordinates
     ctx.translate(ply[1],ply[2]);
     // Rotate ctx
     ctx.rotate((ply[4]* Math.PI) / 180);
@@ -238,7 +238,7 @@ function putPlayer(ply,mA,lX,lY,gC,wC,hC){
     ctx.drawImage(playerImg, ply[3], 0, 100, 100, ply[5], ply[6], ply[0], ply[0]);
     // Reset Rotate
     ctx.rotate((-ply[4] * Math.PI) / 180);
-    // Reset Traslate
+    // Reset Translate
     ctx.translate(-ply[1],-ply[2]);
 
     // Keep Player in Game Canvas 
@@ -290,13 +290,13 @@ function movePlayer(ply){
 }
 // To put Bullets in game Canvas : bul = bullets, gc = Game Canvas, wC = width of Canvas, hC = Height of Canvas 
 function putBullets(bul,gC,wC,hC){
-    // Set Canvas to 2 Dimentional
+    // Set Canvas to 2 dimensional
     ctx = gC.getContext("2d");
-    // Go throught all bullets
+    // Go through all bullets
     for(i=0;i<bul.length;i++){
         // fill Bullet Style
         ctx.fillStyle = bul[i][5]; 
-        // Translate cansvas to bullet position
+        // Translate canvas to bullet position
         ctx.translate(bul[i][1],bul[i][2]);
         // rotate canvas 
         ctx.rotate((bul[i][0] * Math.PI) / 180);
@@ -308,7 +308,7 @@ function putBullets(bul,gC,wC,hC){
         ctx.translate(-bul[i][1],-bul[i][2]);
         // get current bullet degree
         currentBulletDeg = (bul[i][0]* Math.PI) / 180;
-        // Travel bullet X and Y axies of canvas on dignal line of dgree
+        // Travel bullet X and Y axis of canvas on diagonal line of degree
         bul[i][1] += (Math.cos(currentBulletDeg))*10;
         bul[i][2] += (Math.sin(currentBulletDeg))*10;
         //delete bullet when it get out of canvas
@@ -319,24 +319,37 @@ function putBullets(bul,gC,wC,hC){
     // to update current Bullet data
     return bul;
 }
-// To put Bullets in game Canvas : vil = Villain,  tPly = Target Player, gc = Game Canvas 
-function putVillains(vil,tPly,gC){
-    // Before Villain 
+// To put Bullets in game Canvas : vil = Villain,  Ply = Players, bull = Bullets , gc = Game Canvas 
+function putVillains(vil,Ply,bul,gC){
     // Print all villain
     for(i=0;i<vil.length;i++){
+        // Before Print Villain, kill them if they catch bullet
+        // Check each Bullets by players
+        for(p=1;p<Ply.length;p++){
+            //each bullets of Player P
+            for(y=0;y<bul[p].length;y++){
+                // if bullet on the villain then kill it
+                if(near(vil[i][1],vil[i][2],bul[p][y][1],bul[p][y][2],villain[i][3]/2)){
+                    // Delete Bullet
+                    bul[p].splice(y,1);
+                    // Kill Villain update villain array
+                    vil = killVillain(vil,i);
+                }
+            }
+        }
         // get Radian from target player by Anti Tan of that player
-        radians = Math.atan2(tPly[1][1]-vil[i][1], tPly[1][2]-vil[i][2]);
+        radians = Math.atan2(Ply[1][1]-vil[i][1], Ply[1][2]-vil[i][2]);
         // store degree from Radian
         vil[i][5] = Math.round(radians * (180 / Math.PI) * -1);
         // Translate canvas to villain position
         ctx.translate(vil[i][1],vil[i][2]); 
-        // Rotate canvans to villain degree                        
+        // Rotate canvas to villain degree                        
         ctx.rotate((vil[i][5] * Math.PI) / 180);
         // get villain img       
         villainImg = el("#villains");
         // Draw villain
         ctx.drawImage(villainImg, vil[i][0], 0, 150, 150, -vil[i][3]/2, -vil[i][4]/2, vil[i][3], vil[i][4]);
-        // Reset Roatation
+        // Reset Rotation
         ctx.rotate((-vil[i][5] * Math.PI) / 180);
         // Reset translate
         ctx.translate(-vil[i][1],-vil[i][2]);
@@ -344,7 +357,7 @@ function putVillains(vil,tPly,gC){
         vil[i][2] += (Math.cos(vil[i][5]))*0.5;
         vil[i][1] -= (Math.sin(vil[i][5]))*0.5; 
         
-        // increment counter to dectect need of villain animation frame change 
+        // increment counter to detect need of villain animation frame change 
         vil[i][6]++;
         // After +12 change current animation frame
         if(vil[i][6]%12==0){  
@@ -354,4 +367,20 @@ function putVillains(vil,tPly,gC){
     }    
     // to update current villain data
     return vil;
+}
+// To Kill Villain : vill = Villain Array, n = number of that array
+function killVillain(vil,n){
+    //Delete Villain from array
+    vil.splice(n,1);
+    // to update current villain data
+    return vil;
+}
+// To Check if this near to each other then return true 
+function near(x1,y1,x2,y2,diff){
+    if(Math.abs(x1-x2)<=diff
+        && Math.abs(y1-y2)<=diff){
+            return true;
+        } else {
+            return false;
+        }
 }
