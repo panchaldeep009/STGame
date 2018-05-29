@@ -1,9 +1,3 @@
-/*
-Define functions for actions and Prints
-Add Mutiplayer Featuring Array 
-Correct Villain Spelling
-
-*/
 // To get Element
 function el(v,a) {
     if(a){
