@@ -46,7 +46,7 @@ var bullet = [];
 //Variable for Villain
 var villain = [];
 // Variable for how many players are playing
-var players = 2; 
+var players = 1; 
 // Variable for which player has Control
 var cplayer = 1;
 // control allowance Status for player
@@ -200,7 +200,7 @@ function clearGameCanvas(gC,wC,hC){
     // Set Canvas to 2 dimensional
     ctx = gC.getContext("2d");
     // Fill Background
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle=ctx.createPattern(el("#background"),"repeat");
     ctx.fillRect(0, 0, wC, hC); 
 }
 // To put player in game canvas : ply = Player, mA = Movement allowance, lX = looking X position on canvas, lY = looking Y position on canvas, gc = Game Canvas, wC = width of Canvas, hC = Height of Canvas
