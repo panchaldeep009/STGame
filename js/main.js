@@ -46,13 +46,16 @@ var bullet = [];
 //Variable for Villain
 var villain = [];
 // Variable for how many players are playing
-var players = 1; 
+var players = 2; 
 // Variable for which player has Control
 var cplayer = 1;
 // control allowance Status for player
-var movePlayer = true;
+var moveA = [];
+// Fire allowance of players
+var fireA = [];
 // Variables to store player looking coordinates
 var look = [];
+
 // initialize All Player
 for(i=1;i<=players;i++){
     // initialize Player i
@@ -60,9 +63,9 @@ for(i=1;i<=players;i++){
     // Set Player[i][0] = size
     player[i][0] = 120;
     // Set Player[i][1] = canvas position X
-    player[i][1] = (canvasSize/2)+((player[1][0]/2)*(i-1));
+    player[i][1] = getRNum(0+250,canvasSize-250);
     // Set Player[i][2] = canvas position Y 
-    player[i][2] = (canvasSize/2);
+    player[i][2] = getRNum(0+250,canvasSize-250);
     // Set Player[i][1] = position X
     player[i][5] = -(player[1][0]/2);
     // Set Player[i][2] = position Y
@@ -79,6 +82,8 @@ for(i=1;i<=players;i++){
     look[i][1] = canvasSize/2;
     //Set where player i looking on Y axis 
     look[i][2] = 0;
+    fireA[i] = true
+    moveA[i-1] = true;
 }
 // Mouse move on game canvas
 document.onmousemove = function(e) {
@@ -89,14 +94,14 @@ document.onmousemove = function(e) {
 }
 // on keypress
 document.onkeydown = function(e) {
-    if(movePlayer){
+    if(moveA[0]){
     e = e || window.event;
     // if this key is Space key
     if (e.keyCode == '32') {
         // Save current Degree
         currentDeg = (player[cplayer][4]* Math.PI) / 180;
         // Prevent player to take next move
-        movePlayer = false;
+        moveA[0] = false;
         setTimeout(function(){ 
             // Change Player Style
             player[cplayer][3] = 100;   
@@ -115,7 +120,7 @@ document.onkeydown = function(e) {
                     // Change Player canvas in diagonal line of degree
                     player[cplayer][2] += (Math.sin(currentDeg))*20;
                     player[cplayer][1] += (Math.cos(currentDeg))*20; 
-                    movePlayer = true;
+                    moveA[0] = true;
                 },150);
             },150); 
         },150);
@@ -124,35 +129,13 @@ document.onkeydown = function(e) {
 }
 // on click add new bullet to array
 document.onclick = function(e){
-    //bullet width
-    bw = 16;
-    //bullet height
-    bh = 8;
-    //New Bullet array number
-    i = bullet[cplayer].length;
-    //set 2 dimensions bullet array 
-    bullet[cplayer][i] = [];
-    //bullet[N][0] is Rotation
-    bullet[cplayer][i][0] = player[cplayer][4]; 
-    //bullet[N][1] is canvas translation X
-    bullet[cplayer][i][1] = player[cplayer][1]+player[cplayer][5]+(player[cplayer][0]/2);
-    //bullet[N][2] is canvas translation Y
-    bullet[cplayer][i][2] = player[cplayer][2]+player[cplayer][6]+(player[cplayer][0]/2);
-    //bullet[N][3] is width
-    bullet[cplayer][i][3] = bw;
-    //bullet[N][4] is Height
-    bullet[cplayer][i][4] = bh;
-    //bullet[N][5] is Style
-    bullet[cplayer][i][5] = "#FFFF00";
-    //bullet[N][6] is X position of bullet inside of canvas
-    bullet[cplayer][i][6] = 50; 
-    //bullet[N][7] is Y position of bullet inside of canvas
-    bullet[cplayer][i][7] = 20;
+    // Fire Bullet
+    fireBullet(cplayer);
 }
 
 // Put Villain after each 2 second
 var villainComing = setInterval(function(){ 
-    if(villain.length < 50){
+    if(villain.length < 50*players){
         //New Bullet number
         i = villain.length;
         //set 2 dimensions villain array 
@@ -182,15 +165,15 @@ var villainComing = setInterval(function(){
                 villain[i][2] = 0;
             }
         //villain[N][3] is width
-        villain[i][3] = 150;
+        villain[i][3] = 120;
         //villain[N][4] is height
-        villain[i][4] = 150;
+        villain[i][4] = 120;
         //villain[N][5] is Rotation
         villain[i][5] = 0;  
         //for villain Animation Frame change
         villain[i][6] = 0; 
     }
-}, 2000);
+}, 800/players);
 
  // Refresh Game canvas at 60 fps
 var gamePlay = setInterval(function(){ 
@@ -200,9 +183,12 @@ var gamePlay = setInterval(function(){
     // Print all Players and his Bullets 
     for(y=1;y<player.length;y++){
         // Print Player Y and re-update changes
-        player[y] = putPlayer(player[y],movePlayer,look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
+        player[y] = putPlayer(player[y],moveA[y-1],look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
         // Print all bullets of Player[Y] thats stored in array 
         bullet[y] = putBullets(bullet[y],gameCanvas,canvasSize,canvasSize);
+        if(y>1){
+            autoPlayer(y);
+        }
     }
     // Print all villain in Game Canvas
     villain = putVillains(villain,player,bullet,gameCanvas);
@@ -261,32 +247,90 @@ function putPlayer(ply,mA,lX,lY,gC,wC,hC){
     // to update current player data
     return ply;
 }
-// To move player where it looking
-function movePlayer(ply){
-    // Save current Degree
-    currentDeg = (ply[4]* Math.PI) / 180;
-    // Prevent player to take next move
-    setTimeout(function(){ 
-        // Change Player Style
-        ply[3] = 100;   
-        // Change Player canvas in diagonal line of degree
-        ply[2] += (Math.sin(currentDeg))*20;
-        ply[1] += (Math.cos(currentDeg))*20;
-        setTimeout(function(){
+// To move player in looking direction
+function movePly(p){
+    if(moveA[p-1]){
+        // Save current Degree
+        currentDeg = (player[p][4]* Math.PI) / 180;
+        // Prevent player to take next move
+        moveA[p-1] = false;
+        setTimeout(function(){ 
             // Change Player Style
-            ply[3] = 200;
+            player[p][3] = 100;   
             // Change Player canvas in diagonal line of degree
-            ply[2] += (Math.sin(currentDeg))*20;
-            ply[1] += (Math.cos(currentDeg))*20;
+            player[p][2] += (Math.sin(currentDeg))*20;
+            player[p][1] += (Math.cos(currentDeg))*20;
             setTimeout(function(){
                 // Change Player Style
-                ply[3] = 0;
+                player[p][3] = 200;
                 // Change Player canvas in diagonal line of degree
-                ply[2] += (Math.sin(currentDeg))*20;
-                ply[1] += (Math.cos(currentDeg))*20;
-            },150);
+                player[p][2] += (Math.sin(currentDeg))*20;
+                player[p][1] += (Math.cos(currentDeg))*20;
+                setTimeout(function(){
+                    // Change Player Style
+                    player[p][3] = 0;
+                    // Change Player canvas in diagonal line of degree
+                    player[p][2] += (Math.sin(currentDeg))*20;
+                    player[p][1] += (Math.cos(currentDeg))*20; 
+                    moveA[p-1] = true;
+                },150);
+            },150); 
         },150);
-    },150);
+    }
+}
+// To play auto player
+function autoPlayer(p){
+    // Set first Villain as target Villain if exist
+    if(villain[p-1]){
+        tempTgVill = villain[p-1];
+        // Check Nearest Villain
+        for(i=0;i<villain.length;i++){
+            if((Math.sqrt((Math.abs(tempTgVill[1]-player[p][1])^2)+(Math.abs(tempTgVill[2]-player[p][2])^2)) > Math.sqrt(((Math.abs(villain[i][1]-player[p][1])^2)+(Math.abs(villain[i][2]-player[p][2])^2))))){
+                tempTgVill = villain[i];
+            }
+        }
+        look[y][1] = tempTgVill[1];
+        look[y][2] = tempTgVill[2];
+        if(Math.sqrt((Math.abs(tempTgVill[1]-player[p][1])^2)+(Math.abs(tempTgVill[1]-player[p][1])^2)) < 20){
+            fireBullet(p);
+        } else {
+            movePly(p);
+        }
+    }
+}
+// To add Bullets of ply Player
+function fireBullet(p){
+    if(fireA[p]){
+        fireA[p] = false;
+        //bullet width
+        bw = 16;
+        //bullet height
+        bh = 8;
+        //New Bullet array number
+        i = bullet[p].length;
+        //set 2 dimensions bullet array 
+        bullet[p][i] = [];
+        //bullet[N][0] is Rotation
+        bullet[p][i][0] = player[p][4]; 
+        //bullet[N][1] is canvas translation X
+        bullet[p][i][1] = player[p][1]+player[p][5]+(player[p][0]/2);
+        //bullet[N][2] is canvas translation Y
+        bullet[p][i][2] = player[p][2]+player[p][6]+(player[p][0]/2);
+        //bullet[N][3] is width
+        bullet[p][i][3] = bw;
+        //bullet[N][4] is Height
+        bullet[p][i][4] = bh;
+        //bullet[N][5] is Style
+        bullet[p][i][5] = "#FFFF00";
+        //bullet[N][6] is X position of bullet inside of canvas
+        bullet[p][i][6] = 50; 
+        //bullet[N][7] is Y position of bullet inside of canvas
+        bullet[p][i][7] = 20;
+        new Audio('../sounds/bullet.wav').play();
+        setTimeout(function(){ 
+            fireA[p]  = true;
+        }, 300);
+    }
 }
 // To put Bullets in game Canvas : bul = bullets, gc = Game Canvas, wC = width of Canvas, hC = Height of Canvas 
 function putBullets(bul,gC,wC,hC){
@@ -294,14 +338,14 @@ function putBullets(bul,gC,wC,hC){
     ctx = gC.getContext("2d");
     // Go through all bullets
     for(i=0;i<bul.length;i++){
-        // fill Bullet Style
-        ctx.fillStyle = bul[i][5]; 
         // Translate canvas to bullet position
         ctx.translate(bul[i][1],bul[i][2]);
         // rotate canvas 
         ctx.rotate((bul[i][0] * Math.PI) / 180);
-        // Fill bullet in canvas
-        ctx.fillRect(bul[i][6], bul[i][7], bul[i][3], bul[i][4]);
+        // get bullet img       
+        bulletImg = el("#bullet");
+        // Draw bullet
+        ctx.drawImage(bulletImg, bul[i][6], bul[i][7], bul[i][3], bul[i][4]);
         // reset rotate canvas 
         ctx.rotate((-bul[i][0] * Math.PI) / 180);
         // reset translate canvas 
@@ -328,41 +372,57 @@ function putVillains(vil,Ply,bul,gC){
         for(p=1;p<Ply.length;p++){
             //each bullets of Player P
             for(y=0;y<bul[p].length;y++){
-                // if bullet on the villain then kill it
-                if(near(vil[i][1],vil[i][2],bul[p][y][1],bul[p][y][2],villain[i][3]/2)){
-                    // Delete Bullet
-                    bul[p].splice(y,1);
-                    // Kill Villain update villain array
-                    vil = killVillain(vil,i);
+                
+                if(vil[i]){
+                    // if bullet on the villain then kill it
+                    if(near(vil[i][1],vil[i][2],bul[p][y][1],bul[p][y][2],vil[i][3]/2)){
+                        // Delete Bullet
+                        bul[p].splice(y,1);
+                        // Kill Villain update villain array
+                        vil = killVillain(vil,i);
+                    }
                 }
             }
         }
-        // get Radian from target player by Anti Tan of that player
-        radians = Math.atan2(Ply[1][1]-vil[i][1], Ply[1][2]-vil[i][2]);
-        // store degree from Radian
-        vil[i][5] = Math.round(radians * (180 / Math.PI) * -1);
-        // Translate canvas to villain position
-        ctx.translate(vil[i][1],vil[i][2]); 
-        // Rotate canvas to villain degree                        
-        ctx.rotate((vil[i][5] * Math.PI) / 180);
-        // get villain img       
-        villainImg = el("#villains");
-        // Draw villain
-        ctx.drawImage(villainImg, vil[i][0], 0, 150, 150, -vil[i][3]/2, -vil[i][4]/2, vil[i][3], vil[i][4]);
-        // Reset Rotation
-        ctx.rotate((-vil[i][5] * Math.PI) / 180);
-        // Reset translate
-        ctx.translate(-vil[i][1],-vil[i][2]);
-        // Move Villain in direction of degree to follow target player
-        vil[i][2] += (Math.cos(vil[i][5]))*0.5;
-        vil[i][1] -= (Math.sin(vil[i][5]))*0.5; 
+        // Set first player as target player
+        tgPly = Ply[1];
+        // Find nearest target player using pythagoras 
+        for(p=1;p<Ply.length;p++){
+            if(vil[i]){
+                if(Math.sqrt((Math.abs(tgPly[1]-vil[i][1])^2)+(Math.abs(tgPly[1]-vil[i][1])^2)) > Math.sqrt(((Math.abs(Ply[p][1]-vil[i][1])^2)+(Math.abs(Ply[p][1]-vil[i][1])^2)))){
+                    tgPly = Ply[p];
+                }
+            }
+        }
         
-        // increment counter to detect need of villain animation frame change 
-        vil[i][6]++;
-        // After +12 change current animation frame
-        if(vil[i][6]%12==0){  
-            if(vil[i][0] == 150) { vil[i][0] = 0; }
-            else { vil[i][0] = 150; }
+        if(vil[i]){
+            // get Radian from target player by Anti Tan of that player
+            radians = Math.atan2(tgPly[1]-vil[i][1], tgPly[2]-vil[i][2]);
+            // store degree from Radian
+            vil[i][5] = Math.round(radians * (180 / Math.PI) * -1);
+            // Translate canvas to villain position
+            ctx.translate(vil[i][1],vil[i][2]); 
+            // Rotate canvas to villain degree                        
+            ctx.rotate((vil[i][5] * Math.PI) / 180);
+            // get villain img       
+            villainImg = el("#villains");
+            // Draw villain
+            ctx.drawImage(villainImg, vil[i][0], 0, 150, 150, -vil[i][3]/2, -vil[i][4]/2, vil[i][3], vil[i][4]);
+            // Reset Rotation
+            ctx.rotate((-vil[i][5] * Math.PI) / 180);
+            // Reset translate
+            ctx.translate(-vil[i][1],-vil[i][2]);
+            // Move Villain in direction of degree to follow target player
+            vil[i][2] += (Math.cos(vil[i][5]))*0.5;
+            vil[i][1] -= (Math.sin(vil[i][5]))*0.5; 
+            
+            // increment counter to detect need of villain animation frame change 
+            vil[i][6]++;
+            // After +12 change current animation frame
+            if(vil[i][6]%12==0){  
+                if(vil[i][0] == 150) { vil[i][0] = 0; }
+                else { vil[i][0] = 150; }
+            }
         }
     }    
     // to update current villain data
