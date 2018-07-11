@@ -428,10 +428,18 @@ function putVillains(vil,Ply,bul,gC,kvil){
                 }
             }
         }
-        // Set first player as target player
-        tgPly = Ply[1];
-        // Find nearest target player using pythagoras 
+        
+        targetPlayerNum = 1;
         for(p=1;p<Ply.length;p++){
+            // if player is alive 
+            if(Ply[p][7] > 0){
+                // Set first player which alive as target player
+                tgPly = Ply[p];
+                targetPlayerNum = p;
+            }
+        }
+        // Find nearest target player using pythagoras 
+        for(p=targetPlayerNum+1;p<Ply.length;p++){
             // if player is alive 
             if(Ply[p][7] > 0){
                 if(vil[i]){
