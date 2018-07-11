@@ -43,8 +43,10 @@ gameCanvas.setAttribute("height", canvasSize);
 var player = [];
 // Variable for Bullets
 var bullet = [];
-//Variable for Villain
+// Variable for Villain
 var villain = [];
+// killed villain counter per player
+var killed_villain = [];
 // Variable for how many players are playing
 var players = 1; 
 // Variable for which player has Control
@@ -70,6 +72,8 @@ for(i=1;i<=players;i++){
     player[i][5] = -(player[1][0]/2);
     // Set Player[i][2] = position Y
     player[i][6] = -(player[1][0]/2);
+    // Set Player Health 
+    player[i][7] = 100;
     // Set Player[i][3] = style
     player[i][3] = 0;
     // Set Player[i][4] = Rotation
@@ -84,7 +88,20 @@ for(i=1;i<=players;i++){
     look[i][2] = 0;
     fireA[i] = true
     moveA[i-1] = true;
+
+    // Health Status
+    el("#status").innerHTML += "<label>Health of Player "+i+" : <div id=\"health"+i+"\">100</div></label>";
+
+    // Set killed villain Counter for player i
+    killed_villain[i] = 0;
+    
+    // killed villain Status
+    el("#status").innerHTML += "<label>Killed villains by Player "+i+" : <div id=\"kvil"+i+"\">0</div></label><br/>";
 }
+
+// total killed villain Status
+el("#status").innerHTML += "<label>Total Killed villains : <div id=\"tkvil\">0</div></label><br/>";
+
 // Mouse move on game canvas
 document.onmousemove = function(e) {
     offset = gameCanvas.getBoundingClientRect(); 
@@ -135,7 +152,7 @@ document.onclick = function(e){
 
 // Put Villain after each 2 second
 var villainComing = setInterval(function(){ 
-    if(villain.length < 50*players){
+    if(totalVillainKilled(killed_villain) < 80*players){
         //New Bullet number
         i = villain.length;
         //set 2 dimensions villain array 
@@ -179,19 +196,30 @@ var villainComing = setInterval(function(){
 var gamePlay = setInterval(function(){ 
     // Clear Canvas             
     clearGameCanvas(gameCanvas,canvasSize,canvasSize);
-
+    // counter for alive players
+    alive_players = 0;
     // Print all Players and his Bullets 
     for(y=1;y<player.length;y++){
-        // Print Player Y and re-update changes
-        player[y] = putPlayer(player[y],moveA[y-1],look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
-        // Print all bullets of Player[Y] thats stored in array 
-        bullet[y] = putBullets(bullet[y],gameCanvas,canvasSize,canvasSize);
-        if(y>1){
-            autoPlayer(y);
+        //if player is alive
+        if(player[y][7] > 0){
+            // increment alive players counter
+            alive_players ++;
+            // Print Player Y and re-update changes
+            player[y] = putPlayer(player[y],moveA[y-1],look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
+            // Print all bullets of Player[Y] thats stored in array 
+            bullet[y] = putBullets(bullet[y],gameCanvas,canvasSize,canvasSize);
+            if(y>1){
+                autoPlayer(y);
+            }
         }
     }
-    // Print all villain in Game Canvas
-    villain = putVillains(villain,player,bullet,gameCanvas);
+    // if all players alive
+    if(alive_players > 0){
+        // Print all villain in Game Canvas
+        villain = putVillains(villain,player,bullet,gameCanvas,killed_villain);
+    } else {
+        //Game Over
+    }
 
 }, 1000/60);
 
@@ -363,8 +391,8 @@ function putBullets(bul,gC,wC,hC){
     // to update current Bullet data
     return bul;
 }
-// To put Bullets in game Canvas : vil = Villain,  Ply = Players, bull = Bullets , gc = Game Canvas 
-function putVillains(vil,Ply,bul,gC){
+// To put Bullets in game Canvas : vil = Villain,  Ply = Players, bull = Bullets , gc = Game Canvas, kvil = killed villain
+function putVillains(vil,Ply,bul,gC,kvil){
     // Print all villain
     for(i=0;i<vil.length;i++){
         // Before Print Villain, kill them if they catch bullet
@@ -380,6 +408,22 @@ function putVillains(vil,Ply,bul,gC){
                         bul[p].splice(y,1);
                         // Kill Villain update villain array
                         vil = killVillain(vil,i);
+                        // Increment Killed Villain counter for player p and Update status
+                        el("#kvil"+p).innerHTML = ++kvil[p];
+                        el("#tkvil").innerHTML = totalVillainKilled(kvil);
+                    }
+                }
+            }
+            // check if villain is near to player
+            if(vil[i]){
+                // if player is near to villain then get hurt
+                if(near(vil[i][1],vil[i][2],Ply[p][1],Ply[p][2],vil[i][3]/2)){
+                    //if Health is more then 0 then update status
+                    if(Ply[p][7] > 0){
+                        el("#health"+p).innerHTML = --Ply[p][7];
+                    } else {
+                        //Kill Player if it's health get zero
+                        el("#health"+p).innerHTML = "Player Killed";
                     }
                 }
             }
@@ -388,10 +432,16 @@ function putVillains(vil,Ply,bul,gC){
         tgPly = Ply[1];
         // Find nearest target player using pythagoras 
         for(p=1;p<Ply.length;p++){
-            if(vil[i]){
-                if(Math.sqrt((Math.abs(tgPly[1]-vil[i][1])^2)+(Math.abs(tgPly[1]-vil[i][1])^2)) > Math.sqrt(((Math.abs(Ply[p][1]-vil[i][1])^2)+(Math.abs(Ply[p][1]-vil[i][1])^2)))){
-                    tgPly = Ply[p];
+            // if player is alive 
+            if(Ply[p][7]>0){
+                if(vil[i]){
+                    if(Math.sqrt((Math.abs(tgPly[1]-vil[i][1])^2)+(Math.abs(tgPly[1]-vil[i][1])^2)) > Math.sqrt(((Math.abs(Ply[p][1]-vil[i][1])^2)+(Math.abs(Ply[p][1]-vil[i][1])^2)))){
+                        tgPly = Ply[p];
+                    }
                 }
+            } else {
+                // if is not then target will be villain itself to stop moving
+                tgPly = vil[i];
             }
         }
         
@@ -434,6 +484,14 @@ function killVillain(vil,n){
     vil.splice(n,1);
     // to update current villain data
     return vil;
+}
+// Return total killed Villain
+function totalVillainKilled(kvil){
+    total = 0;
+    for(i=1;i<kvil.length;i++){
+        total += kvil[i];
+    }
+    return total;
 }
 // To Check if this near to each other then return true 
 function near(x1,y1,x2,y2,diff){
