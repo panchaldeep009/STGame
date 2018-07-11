@@ -7,6 +7,13 @@ body {
   visibility: hidden;
 }
 
+#status .healthBar {
+  height: 20px;
+  width: 200px;
+  background-color: green;
+  color: white;
+}
+
 #gameCanvas {
   position: absolute;
   top: 50%;

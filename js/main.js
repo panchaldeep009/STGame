@@ -48,7 +48,7 @@ var villain = [];
 // killed villain counter per player
 var killed_villain = [];
 // Variable for how many players are playing
-var players = 1; 
+var players = 5; 
 // Variable for which player has Control
 var cplayer = 1;
 // control allowance Status for player
@@ -90,7 +90,7 @@ for(i=1;i<=players;i++){
     moveA[i-1] = true;
 
     // Health Status
-    el("#status").innerHTML += "<label>Health of Player "+i+" : <div id=\"health"+i+"\">100</div></label>";
+    el("#status").innerHTML += "<label>Health of Player "+i+" : <div class=\"healthBar\" id=\"health"+i+"\">100%</div></label>";
 
     // Set killed villain Counter for player i
     killed_villain[i] = 0;
@@ -190,7 +190,7 @@ var villainComing = setInterval(function(){
         //for villain Animation Frame change
         villain[i][6] = 0; 
     }
-}, 800/players);
+}, (400-totalVillainKilled(killed_villain))/players);
 
  // Refresh Game canvas at 60 fps
 var gamePlay = setInterval(function(){ 
@@ -420,7 +420,7 @@ function putVillains(vil,Ply,bul,gC,kvil){
                 if(near(vil[i][1],vil[i][2],Ply[p][1],Ply[p][2],vil[i][3]/2)){
                     //if Health is more then 0 then update status
                     if(Ply[p][7] > 0){
-                        el("#health"+p).innerHTML = --Ply[p][7];
+                        updateHealth(p, --Ply[p][7]);
                     } else {
                         //Kill Player if it's health get zero
                         el("#health"+p).innerHTML = "Player Killed";
@@ -433,15 +433,12 @@ function putVillains(vil,Ply,bul,gC,kvil){
         // Find nearest target player using pythagoras 
         for(p=1;p<Ply.length;p++){
             // if player is alive 
-            if(Ply[p][7]>0){
+            if(Ply[p][7] > 0){
                 if(vil[i]){
                     if(Math.sqrt((Math.abs(tgPly[1]-vil[i][1])^2)+(Math.abs(tgPly[1]-vil[i][1])^2)) > Math.sqrt(((Math.abs(Ply[p][1]-vil[i][1])^2)+(Math.abs(Ply[p][1]-vil[i][1])^2)))){
                         tgPly = Ply[p];
                     }
                 }
-            } else {
-                // if is not then target will be villain itself to stop moving
-                tgPly = vil[i];
             }
         }
         
@@ -492,6 +489,24 @@ function totalVillainKilled(kvil){
         total += kvil[i];
     }
     return total;
+}
+//Chnage Health
+function updateHealth(i,v){
+    el("#health"+i).innerHTML = v+"%";
+    el("#health"+i).style.width = (v*2)+"px";
+    if(v > 66){
+        el("#health"+i).style.backgroundColor = "green";
+        el("#health"+i).style.color = "white";
+    } else if(v < 66 && v > 33){
+        el("#health"+i).style.backgroundColor = "yellow";
+        el("#health"+i).style.color = "black";
+    } else if(v < 33){
+        el("#health"+i).style.backgroundColor = "red";
+        el("#health"+i).style.color = "white";
+    }
+    if(v == 0){
+        el("#health"+i).style.width = "200px";
+    }
 }
 // To Check if this near to each other then return true 
 function near(x1,y1,x2,y2,diff){
