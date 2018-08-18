@@ -1,4 +1,7 @@
-# STGame
+# Starship Troopers Game
 ```
-Not Ready to Play
+Prepared By
+
+Deepkumar Panchal 
+Maksym Portianoi
 ```
