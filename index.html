@@ -8,13 +8,26 @@
     <title>STGame</title>
 </head>
 <body>
-    <div id="status">
+    <div id="start">
+        <img src="images/title.png" alt="Game Title"/><br/>
+        <label>Total Players : 
+            <select id="numOfPlayers">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+            </select>
+        </label>
+        <button id="start_button">Start</button>
     </div>
-    <canvas id="gameCanvas">
-        <img id="player" src="images/player.png"/>
-        <img id="villains" src="images/villain.png"/>
-        <img id="bullet" src="images/bullet.png"/>
-        <img id="background" src="images/background.jpg"/>
+    <div id="status"></div>
+    <canvas id="gameCanvas" width="0" height="0">
+        <img id="player" src="images/player.png" alt="players"/>
+        <img id="villains" src="images/villain.png" alt="villain"/>
+        <img id="bullet" src="images/bullet.png" alt="bullet"/>
+        <img id="background" src="images/background.jpg" alt="background"/>
     </canvas>
     <script src="js/main.js"></script>
 </body>

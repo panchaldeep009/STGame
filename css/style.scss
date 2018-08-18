@@ -11,16 +11,73 @@ $bColor : rgb(250, 250, 250);
 body{
   overflow: hidden;
   background-color: #c6a361;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .hidden{
   visibility: hidden;
 }
+#start{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  @include transform(translate(-50%,-50%));
+  label{
+    background-color: rgba(255,255,255,.5);
+    font-size: 1.2em;
+    padding: .8em 1.2em;
+    margin: .5em .25em;
+    border-radius: 3em;
+  }
+  img{
+    margin-bottom: 5em;
+  }
+  #numOfPlayers{
+    font-size: 1em !important;
+    padding: .5em;
+    border-radius: 3em;
+    outline: 0;
+  }
+}
+button{
+  font-size: 1.5em;
+  padding: .5em 1em;
+  margin: .5em 1em;
+  border-radius: 3em;
+  border: 0px;
+  outline: 0;
+  cursor: pointer;
+}
 #status{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  @include transform(translate(-50%,-50%));
+  z-index: 5;
+  .playerStatus{
+    padding: .3em;
+    background: rgba(255,255,255,.75);
+    width: 200px;
+    padding: .5em 1em;
+    text-align: center;
+    border-radius: 20px;
+    box-shadow: 1px 5px 5px 5px rgba(0,0,0,.2);
+    margin: .4em .2em;
+    div{
+      display: inline-block;
+    }
+  }
   .healthBar{
     height: 20px;
     width: 200px;
+    min-width: 15px !important;
     background-color: green;
     color: white;
+    text-align: center;
+    padding: .2em 0em;
+    margin: .2em 0em;
+    border-radius: 20px;
+    box-shadow: 1px 5px 5px 5px rgba(0,0,0,.2);
   }
 }
 #gameCanvas{
@@ -28,6 +85,8 @@ body{
   top: 50%;
   left: 50%;
   @include transform(translate(-50%,-50%));
-  border: 1px solid $sColor;
   cursor: none;
+  pointer-events: none;
+  border-radius: 20px;
+  box-shadow: 1px 5px 5px 5px rgba(0,0,0,.2);
 }

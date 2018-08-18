@@ -33,195 +33,223 @@ function minWinSize() {
 function getRNum(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
-// Set Global Game Canvas variable
-var gameCanvas = el("#gameCanvas");
-//Set Game canvas Size
-canvasSize = minWinSize()-100;
-gameCanvas.setAttribute("width", canvasSize);
-gameCanvas.setAttribute("height", canvasSize);
-// Variable to store Players
-var player = [];
-// Variable for Bullets
-var bullet = [];
-// Variable for Villain
-var villain = [];
-// killed villain counter per player
-var killed_villain = [];
-// Variable for how many players are playing
-var players = 5; 
-// Variable for which player has Control
-var cplayer = 1;
-// control allowance Status for player
-var moveA = [];
-// Fire allowance of players
-var fireA = [];
-// Variables to store player looking coordinates
-var look = [];
+var gameCanvas,player,bullet,villain,killed_villain,players,cplayer,moveA,fireA,look,villainComing,gamePlay;
 
-// initialize All Player
-for(i=1;i<=players;i++){
-    // initialize Player i
-    player[i] = [];
-    // Set Player[i][0] = size
-    player[i][0] = 120;
-    // Set Player[i][1] = canvas position X
-    player[i][1] = getRNum(0+250,canvasSize-250);
-    // Set Player[i][2] = canvas position Y 
-    player[i][2] = getRNum(0+250,canvasSize-250);
-    // Set Player[i][1] = position X
-    player[i][5] = -(player[1][0]/2);
-    // Set Player[i][2] = position Y
-    player[i][6] = -(player[1][0]/2);
-    // Set Player Health 
-    player[i][7] = 100;
-    // Set Player[i][3] = style
-    player[i][3] = 0;
-    // Set Player[i][4] = Rotation
-    player[i][4] = 0;
-    //Set Bullets for player i
-    bullet[i] = [];
-    //Set looking direction for player i
-    look[i] = [];
-    //Set where player i looking on X axis 
-    look[i][1] = canvasSize/2;
-    //Set where player i looking on Y axis 
-    look[i][2] = 0;
-    fireA[i] = true
-    moveA[i-1] = true;
+// To Start Game
+document.querySelector('#start_button').addEventListener("click", 
+    function () { startGame(el('#numOfPlayers').value); }
+);
 
-    // Health Status
-    el("#status").innerHTML += "<label>Health of Player "+i+" : <div class=\"healthBar\" id=\"health"+i+"\">100%</div></label>";
+// To Restart Game
+    function restartButton() { 
+        
+        el("#status").style.width = "0px";
+        el("#status").style.height = "0px";
 
-    // Set killed villain Counter for player i
-    killed_villain[i] = 0;
+        el("#gameCanvas").setAttribute("width", 0);
+        el("#gameCanvas").setAttribute("height", 0);
+
+        el("#status").innerHTML = "";
+    }
+
+function startGame(tplayer){
+    // Set Global Game Canvas variable
+    gameCanvas = el("#gameCanvas");
+    //Set Game canvas Size
+    canvasSize = minWinSize()-100;
+    gameCanvas.setAttribute("width", canvasSize);
+    gameCanvas.setAttribute("height", canvasSize);
+    //reset Status size
+    el("#status").style.width = (minWinSize()-100)+"px";
+    el("#status").style.height = (minWinSize()-100)+"px";
+    // Variable to store Players
+    player = [];
+    // Variable for Bullets
+    bullet = [];
+    // Variable for Villain
+    villain = [];
+    // killed villain counter per player
+    killed_villain = [];
+    // Variable for how many players are playing
+    players = tplayer; 
+    // Variable for which player has Control
+    cplayer = 1;
+    // control allowance Status for player
+    moveA = [];
+    // Fire allowance of players
+    fireA = [];
+    // Variables to store player looking coordinates
+    look = [];
     
-    // killed villain Status
-    el("#status").innerHTML += "<label>Killed villains by Player "+i+" : <div id=\"kvil"+i+"\">0</div></label><br/>";
-}
-
-// total killed villain Status
-el("#status").innerHTML += "<label>Total Killed villains : <div id=\"tkvil\">0</div></label><br/>";
-
-// Mouse move on game canvas
-document.onmousemove = function(e) {
-    offset = gameCanvas.getBoundingClientRect(); 
-    // Set controlling player looking on mouse position on canvas
-    look[cplayer][1] = e.pageX - offset.left;
-    look[cplayer][2] = e.pageY - offset.top;
-}
-// on keypress
-document.onkeydown = function(e) {
-    if(moveA[0]){
-    e = e || window.event;
-    // if this key is Space key
-    if (e.keyCode == '32') {
-        // Save current Degree
-        currentDeg = (player[cplayer][4]* Math.PI) / 180;
-        // Prevent player to take next move
-        moveA[0] = false;
-        setTimeout(function(){ 
-            // Change Player Style
-            player[cplayer][3] = 100;   
-            // Change Player canvas in diagonal line of degree
-            player[cplayer][2] += (Math.sin(currentDeg))*20;
-            player[cplayer][1] += (Math.cos(currentDeg))*20;
-            setTimeout(function(){
+    el("#status").innerHTML = "";
+    
+    // initialize All Player
+    for(i=1;i<=players;i++){
+        // initialize Player i
+        player[i] = [];
+        // Set Player[i][0] = size
+        player[i][0] = 120;
+        // Set Player[i][1] = canvas position X
+        player[i][1] = getRNum(0+250,canvasSize-250);
+        // Set Player[i][2] = canvas position Y 
+        player[i][2] = getRNum(0+250,canvasSize-250);
+        // Set Player[i][1] = position X
+        player[i][5] = -(player[1][0]/2);
+        // Set Player[i][2] = position Y
+        player[i][6] = -(player[1][0]/2);
+        // Set Player Health 
+        player[i][7] = 100;
+        // Set Player[i][3] = style
+        player[i][3] = 0;
+        // Set Player[i][4] = Rotation
+        player[i][4] = 0;
+        //Set Bullets for player i
+        bullet[i] = [];
+        //Set looking direction for player i
+        look[i] = [];
+        //Set where player i looking on X axis 
+        look[i][1] = canvasSize/2;
+        //Set where player i looking on Y axis 
+        look[i][2] = 0;
+        fireA[i] = true
+        moveA[i-1] = true;
+        // Set killed villain Counter for player i
+        killed_villain[i] = 0;
+    
+        // Health Status
+        el("#status").innerHTML += 
+        "<div class='playerStatus'>"
+            +"<div class=\"healthBar\" id=\"health"+i+"\">Player "+i+" : 100%</div><br/>"
+            +"Killed Bugs : <span id=\"kvil"+i+"\">0</span>"
+        +"</div>";
+    }
+    
+    // total killed villain Status
+    el("#status").innerHTML += "<div class='playerStatus'>Total Killed villains : <span id=\"tkvil\">0</span></div>";
+    
+    // Mouse move on game canvas
+    document.onmousemove = function(e) {
+        offset = gameCanvas.getBoundingClientRect(); 
+        // Set controlling player looking on mouse position on canvas
+        look[cplayer][1] = e.pageX - offset.left;
+        look[cplayer][2] = e.pageY - offset.top;
+    }
+    // on keypress
+    document.onkeydown = function(e) {
+        if(moveA[0]){
+        e = e || window.event;
+        // if this key is Space key
+        if (e.keyCode == '38') {
+            // Save current Degree
+            currentDeg = (player[cplayer][4]* Math.PI) / 180;
+            // Prevent player to take next move
+            moveA[0] = false;
+            setTimeout(function(){ 
                 // Change Player Style
-                player[cplayer][3] = 200;
+                player[cplayer][3] = 100;   
                 // Change Player canvas in diagonal line of degree
                 player[cplayer][2] += (Math.sin(currentDeg))*20;
                 player[cplayer][1] += (Math.cos(currentDeg))*20;
                 setTimeout(function(){
                     // Change Player Style
-                    player[cplayer][3] = 0;
+                    player[cplayer][3] = 200;
                     // Change Player canvas in diagonal line of degree
                     player[cplayer][2] += (Math.sin(currentDeg))*20;
-                    player[cplayer][1] += (Math.cos(currentDeg))*20; 
-                    moveA[0] = true;
-                },150);
-            },150); 
-        },150);
-    }
-    }
-}
-// on click add new bullet to array
-document.onclick = function(e){
-    // Fire Bullet
-    fireBullet(cplayer);
-}
-
-// Put Villain after each 2 second
-var villainComing = setInterval(function(){ 
-    if(totalVillainKilled(killed_villain) < 80*players){
-        //New Bullet number
-        i = villain.length;
-        //set 2 dimensions villain array 
-        villain[i] = [];
-        //villain[N][0] is Style                    
-        villain[i][0] = 0;
-        randomCase = getRNum(1,5);
-            if(randomCase==1){
-                //villain[N][1] is X position
-                villain[i][1] = canvasSize; 
-                //villain[N][2] is Y position
-                villain[i][2] = getRNum(0,canvasSize);
-            } else if(randomCase==2){
-                //villain[N][1] is X position
-                villain[i][1] = getRNum(0,canvasSize); 
-                //villain[N][2] is Y position
-                villain[i][2] = canvasSize;
-            } else if(randomCase==3){
-                //villain[N][1] is X position
-                villain[i][1] = 0; 
-                //villain[N][2] is Y position
-                villain[i][2] = getRNum(0,canvasSize);
-            } else {
-                //villain[N][1] is X position
-                villain[i][1] = getRNum(0,canvasSize); 
-                //villain[N][2] is Y position
-                villain[i][2] = 0;
-            }
-        //villain[N][3] is width
-        villain[i][3] = 120;
-        //villain[N][4] is height
-        villain[i][4] = 120;
-        //villain[N][5] is Rotation
-        villain[i][5] = 0;  
-        //for villain Animation Frame change
-        villain[i][6] = 0; 
-    }
-}, (400-totalVillainKilled(killed_villain))/players);
-
- // Refresh Game canvas at 60 fps
-var gamePlay = setInterval(function(){ 
-    // Clear Canvas             
-    clearGameCanvas(gameCanvas,canvasSize,canvasSize);
-    // counter for alive players
-    alive_players = 0;
-    // Print all Players and his Bullets 
-    for(y=1;y<player.length;y++){
-        //if player is alive
-        if(player[y][7] > 0){
-            // increment alive players counter
-            alive_players ++;
-            // Print Player Y and re-update changes
-            player[y] = putPlayer(player[y],moveA[y-1],look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
-            // Print all bullets of Player[Y] thats stored in array 
-            bullet[y] = putBullets(bullet[y],gameCanvas,canvasSize,canvasSize);
-            if(y>1){
-                autoPlayer(y);
-            }
+                    player[cplayer][1] += (Math.cos(currentDeg))*20;
+                    setTimeout(function(){
+                        // Change Player Style
+                        player[cplayer][3] = 0;
+                        // Change Player canvas in diagonal line of degree
+                        player[cplayer][2] += (Math.sin(currentDeg))*20;
+                        player[cplayer][1] += (Math.cos(currentDeg))*20; 
+                        moveA[0] = true;
+                    },150);
+                },150); 
+            },150);
+        }
         }
     }
-    // if all players alive
-    if(alive_players > 0){
-        // Print all villain in Game Canvas
-        villain = putVillains(villain,player,bullet,gameCanvas,killed_villain);
-    } else {
-        //Game Over
+    // on click add new bullet to array
+    document.onclick = function(e){
+        // Fire Bullet
+        fireBullet(cplayer);
     }
-
-}, 1000/60);
+    
+    // Put Villain after each 2 second
+    villainComing = setInterval(function(){ 
+        if(totalVillainKilled(killed_villain) < 80*players){
+            //New Bullet number
+            i = villain.length;
+            //set 2 dimensions villain array 
+            villain[i] = [];
+            //villain[N][0] is Style                    
+            villain[i][0] = 0;
+            randomCase = getRNum(1,5);
+                if(randomCase==1){
+                    //villain[N][1] is X position
+                    villain[i][1] = canvasSize; 
+                    //villain[N][2] is Y position
+                    villain[i][2] = getRNum(0,canvasSize);
+                } else if(randomCase==2){
+                    //villain[N][1] is X position
+                    villain[i][1] = getRNum(0,canvasSize); 
+                    //villain[N][2] is Y position
+                    villain[i][2] = canvasSize;
+                } else if(randomCase==3){
+                    //villain[N][1] is X position
+                    villain[i][1] = 0; 
+                    //villain[N][2] is Y position
+                    villain[i][2] = getRNum(0,canvasSize);
+                } else {
+                    //villain[N][1] is X position
+                    villain[i][1] = getRNum(0,canvasSize); 
+                    //villain[N][2] is Y position
+                    villain[i][2] = 0;
+                }
+            //villain[N][3] is width
+            villain[i][3] = 120;
+            //villain[N][4] is height
+            villain[i][4] = 120;
+            //villain[N][5] is Rotation
+            villain[i][5] = 0;  
+            //for villain Animation Frame change
+            villain[i][6] = 0; 
+        }
+    }, (400-totalVillainKilled(killed_villain))/players);
+    
+     // Refresh Game canvas at 60 fps
+    gamePlay = setInterval(function(){ 
+        // Clear Canvas             
+        clearGameCanvas(gameCanvas,canvasSize,canvasSize);
+        // counter for alive players
+        alive_players = 0;
+        // Print all Players and his Bullets 
+        for(y=1;y<player.length;y++){
+            //if player is alive
+            if(player[y][7] > 0){
+                // increment alive players counter
+                alive_players ++;
+                // Print Player Y and re-update changes
+                player[y] = putPlayer(player[y],moveA[y-1],look[y][1],look[y][2],gameCanvas,canvasSize,canvasSize);
+                // Print all bullets of Player[Y] thats stored in array 
+                bullet[y] = putBullets(bullet[y],gameCanvas,canvasSize,canvasSize);
+                if(y>1){
+                    autoPlayer(y);
+                }
+            }
+        }
+        // if all players alive
+        if(alive_players > 0){
+            // Print all villain in Game Canvas
+            villain = putVillains(villain,player,bullet,gameCanvas,killed_villain);
+        } else {
+            clearInterval(gamePlay);
+            clearInterval(villainComing);
+            el("#status").innerHTML += "<button id=\"restart_button\" onclick=\"restartButton()\">Restart Game</button>";
+        }
+    
+    }, 1000/60);    
+}
 
 // To clear game canvas : gc = Game Canvas, wC = width of Canvas, hC = Height of Canvas
 function clearGameCanvas(gC,wC,hC){
@@ -423,23 +451,21 @@ function putVillains(vil,Ply,bul,gC,kvil){
                         updateHealth(p, --Ply[p][7]);
                     } else {
                         //Kill Player if it's health get zero
-                        el("#health"+p).innerHTML = "Player Killed";
+                        el("#health"+p).innerHTML = "Player "+p+" Killed";
                     }
                 }
             }
         }
         
-        targetPlayerNum = 1;
         for(p=1;p<Ply.length;p++){
             // if player is alive 
             if(Ply[p][7] > 0){
                 // Set first player which alive as target player
                 tgPly = Ply[p];
-                targetPlayerNum = p;
             }
         }
         // Find nearest target player using pythagoras 
-        for(p=targetPlayerNum+1;p<Ply.length;p++){
+        for(p=1;p<Ply.length;p++){
             // if player is alive 
             if(Ply[p][7] > 0){
                 if(vil[i]){
@@ -498,10 +524,9 @@ function totalVillainKilled(kvil){
     }
     return total;
 }
-//Chnage Health
+//Change Health
 function updateHealth(i,v){
-    el("#health"+i).innerHTML = v+"%";
-    el("#health"+i).style.width = (v*2)+"px";
+    el("#health"+i).innerHTML = "Player "+i+" : "+v+"%";
     if(v > 66){
         el("#health"+i).style.backgroundColor = "green";
         el("#health"+i).style.color = "white";
